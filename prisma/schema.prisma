@@ -1,0 +1,43 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pedido {
+  codigoPedido   Int      @id
+  nomePaciente   String
+  dataNascimento String
+  sexo           String
+  codUnidade     Int
+  integrado      Boolean  @default(false)
+  exames         Exame[]
+  documentos     Documento[]
+}
+
+model Exame {
+  accessionNumber  String   @id
+  modalidade       String
+  codigoItemPedido Int?
+  nomeProcedimento String?
+  nomePaciente     String?
+  status           String?
+  codigoPedido     Int?
+  pedido           Pedido?  @relation(fields: [codigoPedido], references: [codigoPedido])
+}
+
+model Documento {
+  codigoDocumento Int
+  codigoPedido    Int
+  nomeDocumento   String
+  documento       String
+  integrado       Boolean @default(false)
+  
+  pedido          Pedido  @relation(fields: [codigoPedido], references: [codigoPedido])
+
+  @@id([codigoDocumento, codigoPedido])
+}
